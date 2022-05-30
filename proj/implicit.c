@@ -13,13 +13,13 @@ int main(int argc,char **argv)
         PetscMPIInt     rank;
         PetscInt        n=10, max_its=1000;
         PetscInt        i, rstart, rend, its, M, col[3];
-	PetscReal	rou=1.0, c=1.0, k=1.0, dt=0.1, l=1.0, f_to_set;
-	PetscScalar	value[3], one=1, zero=0, minus=-1.0;
+	PetscReal	rou=1.0, c=1.0, k=1.0, dt=0.1, l=1.0, f_to_set, value_to_set, norm_uold=0.0, norm_u=1.0;
+	PetscScalar	value[3], one=1, minus=-1.0;
 	Vec             u, f, uold, u_f;
 	Mat		A;
 	KSP		ksp;
 	
-	double		err, sum_u_old=0.0, sum_u=1.0, value_to_set;
+	double		err;
 	
 	// The first column is the type of bcs, 1 for set value, 2 for heat flux
 	// The firt row represents point at left end
@@ -36,7 +36,7 @@ int main(int argc,char **argv)
         M = n+1;
 	double const dx = 1.0/n;
         PetscPrintf(comm, "Matrix size is %d by %d \n", M, M);
-	printf("dx = %f\n",dx);
+	PetscPrintf(comm, "dx=%f\n",dx);
 	
 	// define to consts
 	double const para1 = dt * k / dx / dx / rou / c;
@@ -116,9 +116,10 @@ int main(int argc,char **argv)
 		f_to_set = para2 * sin(l*pi*i*dx);
 		VecSetValues(f,1,&i,&f_to_set,INSERT_VALUES);
 	}
+	VecAssemblyBegin(f);
+        VecAssemblyEnd(f);
 	// VecView(f,PETSC_VIEWER_STDOUT_WORLD);
 	
-	VecSet(u,0.0);
 	VecSet(uold,0.0);
 	VecSet(u_f,0.0);
 
@@ -128,7 +129,7 @@ int main(int argc,char **argv)
 
 		
 	// Iteration start
-	for (i=0; i<100; i++){
+	for (its=0; its<max_its; its++){
 	
 		VecCopy(u,uold);	
 		VecAXPY(uold, one, f);
@@ -162,13 +163,13 @@ int main(int argc,char **argv)
 		KSPSolve(ksp,uold,u);
 		
 		// VecView(u,PETSC_VIEWER_STDOUT_WORLD);
-		VecSum(u, &sum_u);
-		err = fabs(sum_u - sum_u_old);
+		VecNorm(u,NORM_1,&norm_u);
+		err = fabs(norm_u - norm_uold);
 		if ( err < 1.e-8){
-			PetscPrintf(comm, "End at %Dth iter, err=%g\n",i+1,err);
+			PetscPrintf(comm, "End at %Dth iter, err=%g\n",its+1,err);
 			break;
 		}
-		sum_u_old = sum_u;
+		norm_uold = norm_u;
 		
 	}
 	
