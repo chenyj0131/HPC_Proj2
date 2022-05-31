@@ -1,0 +1,37 @@
+\documentclass[a4paper,10pt]{article}
+\usepackage{amsmath}
+\usepackage{geometry}
+\usepackage{bm}
+\usepackage{graphicx}
+\geometry{left=1.25cm,right=1.25cm,top=2cm,bottom=2cm}
+\begin{document}
+12132386 Chen Yujie
+\begin{center}
+{\LARGE Project Report}
+\\ \hspace*{\fill} \\
+{\large one-dimensional heat conduction}
+\\ \hspace*{\fill} \\
+\end{center}
+
+{\large 1. Algorithm framework}
+
+In this project, the governing equation of one-dimensional heat conduction problem, the boundary conditions and the initial value can be expressed as
+\begin{align}
+\rho c\frac{\partial u}{\partial t}-\kappa \frac{\partial ^2 u}{\partial x^2}=f \quad &on\  \Omega \times (0,T) \\
+u=0 \quad &on \  \Gamma \times (0,T) \\
+u|_{t=0} =u_0 =  e^x \quad &in \ \Omega .
+\end{align}
+Here, $\Omega$ :=(0,1) is the 1D domain. The boundary domain is $\Gamma$ = $\left\{ 0,1 \right\} $. $\rho$, $c$, $\kappa$ are the density, heat capacity and heat conductivity respectively. $f \ =sin(\pi x)$ is the heat supply per unit volume. 
+
+
+
+
+
+
+
+
+
+
+
+
+\end{document}
