@@ -23,13 +23,53 @@ u|_{t=0} =u_0 =  e^x \quad &in \ \Omega .
 \end{align}
 Here, $\Omega$ :=(0,1) is the 1D domain. The boundary domain is $\Gamma$ = $\left\{ 0,1 \right\} $. $\rho$, $c$, $\kappa$ are the density, heat capacity and heat conductivity respectively. $f \ =sin(\pi x)$ is the heat supply per unit volume. 
 
+Both explicit and implicit method is applied to solve this problem. The derivation of the two schemes are provided as follows.
 
+Explicit Euler method
+\begin{align*}
+& \rho c \frac{\partial u}{\partial t} - \kappa \frac{\partial ^2 u}{\partial x^2} = f \\
+& \frac{\partial u}{\partial t} = \frac{\kappa}{\rho c} \frac{\partial ^2 u}{\partial x^2} + \frac{f}{\rho c} \\
+& \frac{\partial u}{\partial t} \sim \frac{U_i^{n+1} - U_i^n}{\Delta t} \\
+& \frac{\partial ^2 u}{\partial x^2} \sim \frac{U_{i-1}^n - 2 U_i^n + U_{i+1}^n}{\Delta x^2} \\
+& \frac{U_i^{n+1} - U_i^n}{\Delta t} = \frac{\kappa}{\rho c} \frac{U_{i-1}^n - 2 U_i^n + U_{i+1}^n}{\Delta x^2} + \frac{f}{\rho c} \\
+& U_i^{n+1} - U_i^n = \frac{\kappa \Delta t}{\rho c \Delta x^2} ( U_{i-1}^n - 2 U_i^n + U_{i+1}^n ) + \frac{f \Delta t}{\rho c} \\
+& U_i^{n+1} = \frac{\kappa \Delta t}{\rho c \Delta x^2} U_{i-1}^n + ( 1 - 2 \frac{\kappa \Delta t}{\rho c \Delta x^2} ) U_i^n + \frac{\kappa \Delta t}{\rho c \Delta x^2} U_{i+1}^n + \frac{f \Delta t}{\rho c} \\
+& \bm A = \bm I + \frac{\kappa \Delta t}{\rho c \Delta x^2}
+\begin{bmatrix}
+-2 & 1  & \  & \  & \  \\
+1  & -2 & 1  & \  & \  \\
+\  & \ddots & \ddots & \ddots & \ \\
+\  & \  & 1  & -2 & 1  \\
+\  & \  & \  & 1  & -2 
+\end{bmatrix} \\
+& \bm U^{n+1} = \bm A \bm U^n
+\end{align*}
 
+Implicit Euler method
+\begin{align*}
+& \rho c \frac{\partial u}{\partial t} - \kappa \frac{\partial ^2 u}{\partial x^2} = f \\
+& \frac{\partial u}{\partial t} = \frac{\kappa}{\rho c} \frac{\partial ^2 u}{\partial x^2} + \frac{f}{\rho c} \\
+& \frac{\partial u}{\partial t} \sim \frac{U_i^{n+1} - U_i^n}{\Delta t} \\
+& \frac{\partial ^2 u}{\partial x^2} \sim \frac{U_{i-1}^{n+1} - 2 U_i^{n+1} + U_{i+1}^{n+1}}{\Delta x^2} \\
+& \frac{U_i^{n+1} - U_i^n}{\Delta t} = \frac{\kappa}{\rho c} \frac{U_{i-1}^{n+1} - 2 U_i^{n+1} + U_{i+1}^{n+1}}{\Delta x^2} + \frac{f}{\rho c} \\
+& U_i^{n+1} - U_i^n = \frac{\kappa \Delta t}{\rho c \Delta x^2} \left( U_{i-1}^{n+1} - 2 U_i^{n+1} + U_{i+1}^{n+1} \right) + \frac{f \Delta t}{\rho c} \\
+& - \frac{\kappa \Delta t}{\rho c \Delta x^2} U_{i+1}^{n+1} + \left( 1 + 2 \frac{\kappa \Delta t}{\rho c \Delta x^2} \right) U_i^{n+1} - \frac{\kappa \Delta t}{\rho c \Delta x^2} U_{i-1}^{n+1} = U_i^n + \frac{f \Delta t}{\rho c} \\
+& \bm A = \bm I + \frac{\kappa \Delta t}{\rho c \Delta x^2}
+\begin{bmatrix}
+2  & -1 & \  & \  & \  \\
+-1 & 2  & -1 & \  & \  \\
+\  & \ddots & \ddots & \ddots & \ \\
+\  & \  & -1 & 2  & -1 \\
+\  & \  & \  & -1 & 2 
+\end{bmatrix} \\
+& \bm A \bm U^{n+1} = \bm U^n
+\end{align*}
 
-
-
-
-
+The convergence condition for explicit scheme is 
+\begin{align*}
+\frac{\kappa \Delta t}{\rho c \Delta x^2} < \frac{1}{2},
+\end{align*}
+and the implicit scheme always converges.
 
 
 
