@@ -1,0 +1,18 @@
+#!/bin/bash
+#BSUB -J 1.1
+#BSUB -q debug
+#BSUB -n 8
+#BSUB -o %J.err
+#BSUB -R "span[ptile=40]"
+
+
+mpirun -np 1 ./main -n 200 -dt 1e-5    		-its 20000              -log_view > M200-dt_1e-5.log 2>&1
+mpirun -np 1 ./main -n 200 -dt 5e-6    		-its 40000              -log_view > M200-dt_5e-6.log 2>&1
+mpirun -np 1 ./main -n 200 -dt 2.5e-6   	-its 80000              -log_view > M200-dt_2.5e-6.log 2>&1
+mpirun -np 1 ./main -n 200 -dt 1.25e-6  	-its 160000             -log_view > M200-dt_1.25e-6.log 2>&1
+mpirun -np 1 ./main -n 200 -dt 6.25e-7  	-its 320000             -log_view > M200-dt_6.25e-7.log 2>&1
+mpirun -np 1 ./main -n 200 -dt 3.125e-7 	-its 640000             -log_view > M200-dt_3.125e-7.log 2>&1
+mpirun -np 1 ./main -n 200 -dt 1.5625e-7 	-its 1280000            -log_view > M200-dt_1.5625e-7.log 2>&1
+
+
+

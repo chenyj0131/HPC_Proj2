@@ -10,7 +10,7 @@ int main(int argc,char **argv)
 {
         MPI_Comm        comm;
         PetscMPIInt     rank;
-        PetscInt        n=10, max_its=200000;
+        PetscInt        n=10, max_its=5000000;
         PetscInt        i, rstart, rend, its, M, col[3], index;
         PetscReal       rou=1.0, c=1.0, k=1.0, dt=0.001, l=1.0, value_to_set;
 	PetscScalar	value[3], max_value, minus=-1.0;
@@ -30,7 +30,7 @@ int main(int argc,char **argv)
 	PetscOptionsGetInt(NULL, NULL, "-n", &n, NULL);
 	PetscOptionsGetReal(NULL, NULL, "-dt", &dt, NULL);
 	PetscOptionsGetInt(NULL, NULL, "-its", &max_its, NULL);
-	
+
 	PetscPrintf(comm, "dt=%g\n",dt);
 	
         M = n+1;
@@ -111,7 +111,7 @@ int main(int argc,char **argv)
 	// VecView(f,PETSC_VIEWER_STDOUT_WORLD);
 	
 	VecDuplicate(u,&u_exact);
-	VecGetOwnershipRange(u_exact,&rstart,&rend);
+        VecGetOwnershipRange(u_exact,&rstart,&rend);
         for (i=rstart; i<rend; i++)
         {
                 value_to_set = sin(l*pi*i*dx)/pi/pi;
@@ -124,22 +124,36 @@ int main(int argc,char **argv)
 	/* iteration start */
 	for (its=0; its<max_its; its++){
 		
+			
 		VecCopy(u_exact,diff);
                 VecAXPY(diff, minus, u);
                 VecAbs(diff);
                 VecMax(diff, NULL, &err);
+		/*
                 if ( err < 1.e-8){
                         PetscPrintf(comm, "Converge at %Dth iter, err=%g\n",its,err);
                         break;
                 }
-		
+		*/
+
 		VecCopy(u,uold);
 		MatMultAdd(A, uold, f, u);
-			
+		
+		/*
+		VecNorm(u,NORM_1,&norm_u);
+		err = fabs(norm_u - norm_uold);
+		
+		if ( err < 1.e-8){
+                        PetscPrintf(comm, "Converge at %Dth iter, err=%g\n",its+1,err);
+                        break;
+                }
+		norm_uold = norm_u;
+		*/
+		
 	}
 	
 	// VecView(u,PETSC_VIEWER_STDOUT_WORLD);			
-	PetscPrintf(comm, "End at %Dth iter, err=%g\n",its+1,err);
+	PetscPrintf(comm, "End at %Dth iter, err=%g\n",its,err);
 	
 	index = n/2;
 	VecGetValues(u, 1, &index, &max_value);
@@ -149,6 +163,8 @@ int main(int argc,char **argv)
 	
 	VecDestroy(&u);
 	VecDestroy(&uold);
+	VecDestroy(&u_exact);
+	VecDestroy(&diff);
 	VecDestroy(&f);
 	MatDestroy(&A);
 
