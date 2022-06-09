@@ -72,6 +72,35 @@ and the implicit scheme always converges.
 
 The steady state is characterized by $\partial u/ \partial t=0$. Thus, $u=\frac{sin(\pi x)}{\pi ^2}$ at steady state.\\
 
+\large \textbf {Method Stability}
+
+In this part, $\Delta x$ is fixed at 0.01. Various time steps are introduced to test the stability. For the explicit scheme,  $\Delta t$ is set 1e-5, 2e-5, 4e-5, 5e-5, 6e-5 respectively. The results are listed in Fig. 1. There are three criterions to finish the iteration. First, max iteration times. Second, the max error compared with theoretical solution. Third, if the difference of u between two iteration step is small enough, the iteration would break, since if $\Delta x$ is not small enough, it can reach the second criterion. In the output, "value not change" means hitting the third criterion. Value at domain centre is present for comparison with theoretical data, 0.1013212.
+
+For implicit scheme, $\Delta t$ is set much larger, at 1e-3, 4e-4, 5e-5. It can be observed that implicit scheme always converges. For explicit scheme, when $\Delta t$ is less than 5e-5, it would converge, otherwise diverge, which is in agreement with prediction. Larger time step results in faster convergence.
+
+The value of u is displayed with respect to x. As shown in Fig. 3, which is in agreement with theoretical solution.
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.8]{explicit_stability.jpg}
+	\caption{stability test for explicit scheme}
+\end{figure}
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.8]{implicit_stability.jpg}
+	\caption{stability test for implicit scheme}
+\end{figure}
+
+
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.5]{u_x.png}
+	\caption{distribution of u}
+\end{figure}
+
+\clearpage
 \large \textbf {Error Analysis}
 
 Here, I focused on the value at the center of the domain, i.e. at x=0.5. In explicit scheme, the error of the data is related to the discretization of space and time: 
@@ -79,17 +108,17 @@ Here, I focused on the value at the center of the domain, i.e. at x=0.5. In expl
 e \approx C_1 \Delta x^\alpha + C_2 \Delta t^\beta .
 \end{align}
 
-To get the value of $\alpha$ , $\Delta$ t is fixed at 5e-6, and the domain is divided into 8, 16, 32, 64, 128, 256 parts respectively. The value of $u$ changes little after 1.5 seconds, i.e., the steady state is roughly after 1.5 seconds. In this part, the iteration number is set 400000 to stop after 2 seconds. The corresponding error is defined as the difference between the numerical data and the theoretical data at x=0.5. Note that the theoretical data at x=0.5 at steady state is $1/(\pi ^2)$. The results are plot is log form. As shown in Fig. 1, the slop of the line is around 2.001. Thus, the value of $\alpha$ is determined as 2.
+To get the value of $\alpha$ , $\Delta$ t is fixed at 5e-6, and the domain is divided into 8, 16, 32, 64, 128, 256 parts respectively. The value of $u$ changes little after 1.5 seconds, i.e., the steady state is roughly after 1.5 seconds. In this part, the iteration number is set 400000 to stop after 2 seconds. The corresponding error is defined as the difference between the numerical data and the theoretical data at x=0.5. Note that the theoretical data at x=0.5 at steady state is $1/(\pi ^2)$. The results are plot is log form. As shown in Fig. 4, the slop of the line is around 2.001. Thus, the value of $\alpha$ is determined as 2.
 \begin{figure}[h]
 	\centering
-	\includegraphics[scale=1]{alpha.eps}
+	\includegraphics[scale=0.65]{alpha.eps}
 	\caption{err versus dx}
 \end{figure}
 
-To get the value of $\beta$, $\Delta x$ is fixed at 0.005, $\Delta t$ varies at 1e-6, 5e-6, 2.5e-6, 1.25e-6, 6.25e-7, 3.125e-7. Each sample stop at 0.1 second. The error is defined as the difference between each sample at the sample of $\Delta t = 3.125e-7$. The results are plot in log form. As shown in Fig. 2, the slop of the line passing through the red points is 0.94. Thus, the value of $\beta$ is determined as 1.
+To get the value of $\beta$, $\Delta x$ is fixed at 0.005, $\Delta t$ varies at 1e-6, 5e-6, 2.5e-6, 1.25e-6, 6.25e-7, 3.125e-7. Each sample stop at 0.1 second. The error is defined as the difference between each sample at the sample of $\Delta t = 3.125e-7$. The results are plot in log form. As shown in Fig. 5, the slop of the line passing through the red points is 0.94. Thus, the value of $\beta$ is determined as 1.
 \begin{figure}[h]
 	\centering
-	\includegraphics[scale=1]{beta.eps}
+	\includegraphics[scale=0.65]{beta.eps}
 	\caption{err versus dt}
 \end{figure}
 
@@ -97,14 +126,14 @@ To get the value of $\beta$, $\Delta x$ is fixed at 0.005, $\Delta t$ varies at 
 
 \large \textbf {Parallelism}
 
-In this part, examples of parallel behaviours are presented from explicit scheme. To observe Amdahl's Law, the domain is divided into 40000 parts, and the processor number is set 1, 2, 4, 8 respectively. Fig. 3 shows the speed-up ratio with respect to processor number. The yellow line has a slope of 1 for reference. 
+In this part, examples of parallel behaviours are presented from explicit scheme. To observe Amdahl's Law, the domain is divided into 40000 parts, and the processor number is set 1, 2, 4, 8 respectively. Fig. 6 shows the speed-up ratio with respect to processor number. The yellow line has a slope of 1 for reference. 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.6]{Amdahl.png}
 	\caption{speed-up ratio versus processor number}
 \end{figure} \\
 
-To observe Gustafson's Law, division number is set 500, 1000, 1500, 2000, 2500, 3000 with processor number at 1, 4, 9, 16, 27, 36 respectively. Fig. 4 illustrates the time spent with respect to processor number. Time spent increase gradually as processor number increases. While the time cost using 4 processors is significant higher abnormally, which needs further discussion. 
+To observe Gustafson's Law, division number is set 500, 1000, 1500, 2000, 2500, 3000 with processor number at 1, 4, 9, 16, 27, 36 respectively. Iteration times is 1e7. Fig. 7 illustrates the time spent with respect to processor number. Time spent increase gradually as processor number increases. While the time cost using 4 processors is significant higher abnormally, which needs further discussion. 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.6]{Gustafson.png}
@@ -114,7 +143,7 @@ To observe Gustafson's Law, division number is set 500, 1000, 1500, 2000, 2500, 
 
 \large \textbf {Visualization}
 
-To visualize the results, output data is written in tecplot manner. Fig. 5 is from implicit scheme with matrix size of 1000 by 1000. 
+To visualize the results, output data is written in tecplot manner. Fig. 8 is from implicit scheme with matrix size of 1000 by 1000. 
 \begin{figure}[h]
 	\centering
 	\includegraphics[scale=0.2]{result_in_tecplot.png}
@@ -122,12 +151,43 @@ To visualize the results, output data is written in tecplot manner. Fig. 5 is fr
 \end{figure} \\
 
 
+\large \textbf {Data log in HDF5}
+
+To use hdf5 to record the data, <petscviewerhdf5.h> was included. The data of u is recorded in a hdf5 file every 100 steps. Fig. 9 gives an example of the record where dx=0.025.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.6]{hdf5_sample.jpg}
+	\caption{sample of HDF5 file}
+\end{figure}
+
+\clearpage
+
+\large \textbf {Profiling analysis}
+
+The profile of the code is provided by callgrind. The two figures bellow are samples given by implicit scheme and explicit scheme. In the implicit scheme, most time is consumed in the linear solver and finding the location of the functions in the library. In the explicit scheme, matrix-vector multiplication consumed most time.
 
 
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.35]{profile_implicit.jpg}
+	\caption{profile of implicit scheme}
+\end{figure}
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.35]{profile_explicit.jpg}
+	\caption{profile of explicit scheme}
+\end{figure}
 
+\clearpage
+\large \textbf {Preconditioner}
 
-
-
+The result in this part maybe irrational, since there are some bugs I can't handle in my implicit coding: when the processor number is larger than 4, the program tends to give wrong result. Various of preconditioners are tested, as shown in Fig. 12.
+\begin{figure}[h]
+	\centering
+	\includegraphics[scale=0.8]{pc_script.png}
+	\caption{job script for different preconditioners}
+\end{figure}
+All the jobs in this script gave out the correct result. The hypre-type preconditioner gave the best result.
 
 
 

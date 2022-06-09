@@ -10,9 +10,9 @@ int main(int argc,char **argv)
 {
         MPI_Comm        comm;
         PetscMPIInt     rank;
-        PetscInt        n=10, max_its=200000;
-        PetscInt        i, rstart, rend, its, M, col[3], index;
-        PetscReal       rou=1.0, c=1.0, k=1.0, dt=0.001, l=1.0, value_to_set;
+        PetscInt        n=10, max_its=200000000;
+        PetscInt        i, rstart, rend, its, index, M, col[3], centre_index;
+        PetscReal       rou=1.0, c=1.0, k=1.0, dt=0.001, l=1.0, value_to_set, x_coord, value1, centre, centre_old=0.0;
 	PetscScalar	value[3], max_value, minus=-1.0;
 	Vec		u, uold, f, diff, u_exact;
 	Mat		A;
@@ -49,8 +49,6 @@ int main(int argc,char **argv)
 	double const para1 = dt * k / dx / dx / rou / c;
         double const para2 = dt / rou / c;
         double const pi = PETSC_PI;
-
-	PetscPrintf(comm, "para2=%g\n",para2);
 	
 	// Preallocate matrix A
 	MatCreate(PETSC_COMM_WORLD,&A);
@@ -120,6 +118,7 @@ int main(int argc,char **argv)
         VecAssemblyBegin(u_exact);
         VecAssemblyEnd(u_exact);
 	
+	centre_index = n/2;
 	
 	/* iteration start */
 	for (its=0; its<max_its; its++){
@@ -128,6 +127,7 @@ int main(int argc,char **argv)
                 VecAXPY(diff, minus, u);
                 VecAbs(diff);
                 VecMax(diff, NULL, &err);
+		
                 if ( err < 1.e-8){
                         PetscPrintf(comm, "Converge at %Dth iter, err=%g\n",its,err);
                         break;
@@ -135,23 +135,42 @@ int main(int argc,char **argv)
 		
 		VecCopy(u,uold);
 		MatMultAdd(A, uold, f, u);
-			
+		
+		VecGetValues(u, 1, &centre_index, &centre);
+		if (fabs(centre - centre_old) < 1e-9){
+			PetscPrintf(comm, "value not change\n");
+			break;
+		}
+		centre_old = centre;		
 	}
 	
 	// VecView(u,PETSC_VIEWER_STDOUT_WORLD);			
-	PetscPrintf(comm, "End at %Dth iter, err=%g\n",its+1,err);
+	PetscPrintf(comm, "End at %Dth iter, err=%g\n",its,err);
 	
-	index = n/2;
-	VecGetValues(u, 1, &index, &max_value);
-	PetscPrintf(comm, "max_value=%g\n",max_value);
+	VecGetValues(u, 1, &centre_index, &max_value);
+	PetscPrintf(comm, "max_value at centre: %g\n",max_value);
 	
+	/* write result in tecplot */
+        FILE *plot = fopen("result.plt","w");
+        fprintf(plot, "TITLE=\"1D result\"\n");
+        fprintf(plot, "ZONES\"\n");
+        fprintf(plot, "VARIABLES = \"X\", \"Y\", \"U\"\n");
+        fprintf(plot, "ZONE T=\"2-D Domain\", F=POINT,\n");
+
+        for (int i=0; i<M; i++){
+                index = i;
+                VecGetValues(u, 1, &index, &value1);
+                x_coord = i*dx;
+                fprintf(plot, "%g  %g  %g\n", x_coord, 0.0, value1);
+        }
 	
 	
 	VecDestroy(&u);
 	VecDestroy(&uold);
 	VecDestroy(&f);
+	VecDestroy(&diff);
 	MatDestroy(&A);
-
+	
         PetscFinalize();
 }
 

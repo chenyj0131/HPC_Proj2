@@ -1,0 +1,12 @@
+#!/bin/bash
+#BSUB -J 1.1
+#BSUB -q debug
+#BSUB -n 2
+#BSUB -o %J.err
+#BSUB -R "span[ptile=40]"
+
+
+mpirun -np 1 ./main -n 10000   > 10000-1.log 2>&1
+mpirun -np 2 ./main -n 10000   > 10000-2.log 2>&1
+
+
